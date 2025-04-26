@@ -12,7 +12,7 @@ Typescript backend template with NestJS and PostgreSQL
 Starts the server in development mode with hot-reloading.
 
 ```shell script
-npm run dev
+npm run start:dev
 ```
 
 ### Build 

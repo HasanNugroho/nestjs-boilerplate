@@ -17,7 +17,7 @@ export class UserService {
     }
 
     // Method to create a new user
-    async createUser(userData: Partial<User>): Promise<User> {
+    async createUser(userData: User): Promise<User> {
         // Check if the email or username already exists
         const existingUser = await this.userRepository.findByEmail(userData.email);
 
