@@ -35,7 +35,7 @@ export interface IUserRepository {
      * 
      * @returns The updated user
      */
-    update(id: string, user: User): Promise<User>;
+    update(id: string, user: User): Promise<User | null>;
 
     /**
      * @param id - identifier of the user to update

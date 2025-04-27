@@ -10,11 +10,25 @@ export class CreateUserDto {
     email: string
 
     @ApiProperty({
-        description: "Nama user",
+        description: "user name",
         example: "adam"
     })
     @IsString()
     name: string
+
+    @ApiProperty({
+        description: "user fullname",
+        example: "adam smith"
+    })
+    @IsString()
+    fullname: string
+
+    @ApiProperty({
+        description: "username",
+        example: "adam"
+    })
+    @IsString()
+    username: string
 
     @ApiProperty({
         description: "password",
