@@ -15,7 +15,6 @@ export class UserService implements IUserService {
     // Method to get a user by ID
     async getById(id: string): Promise<User> {
         const user = await this.userRepository.findById(id);
-
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
@@ -25,7 +24,6 @@ export class UserService implements IUserService {
 
     async getByEmail(email: string): Promise<User> {
         const user = await this.userRepository.findByEmail(email);
-
         if (!user) {
             throw new NotFoundException(`User with email ${email} not found`);
         }
@@ -35,7 +33,6 @@ export class UserService implements IUserService {
 
     async getByUsername(username: string): Promise<User> {
         const user = await this.userRepository.findByUsername(username);
-
         if (!user) {
             throw new NotFoundException(`User with username ${username} not found`);
         }
@@ -47,7 +44,6 @@ export class UserService implements IUserService {
     async create(userData: CreateUserDto): Promise<User> {
         // Check if the email or username already exists
         const existingUser = await this.userRepository.findByEmail(userData.email);
-
         if (existingUser) {
             throw new ConflictException('Email is already in use');
         }
@@ -68,7 +64,6 @@ export class UserService implements IUserService {
     // Method to update an existing user's information
     async update(id: string, userData: Partial<User>): Promise<User> {
         const user = await this.userRepository.findById(id);
-
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
@@ -86,7 +81,6 @@ export class UserService implements IUserService {
 
         // Save the updated user
         const updatedUser = await this.userRepository.update(id, user);
-
         if (!updatedUser) {
             throw new NotFoundException(`Failed to update user with ID ${id}`);
         }
@@ -97,7 +91,6 @@ export class UserService implements IUserService {
     // Method to delete a user by ID
     async delete(id: string): Promise<void> {
         const user = await this.userRepository.findById(id);
-
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
