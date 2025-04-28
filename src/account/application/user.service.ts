@@ -1,16 +1,20 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { IUserRepository } from "../domain/repository/user.repository.interface";
-import { User } from "../domain/entities/user";
+import { BadRequestException, ConflictException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { IUserService } from '../domain/service/user.service.interface';
-import { CreateUserDto } from '../domain/dto/user.dto';
+import { IUserRepository } from "../domain/repository/user.repository.interface";
 import { USER_REPOSITORY } from 'src/shared/constant';
+import { User } from "../domain/entities/user";
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UserService implements IUserService {
     constructor(
         @Inject(USER_REPOSITORY)
-        private readonly userRepository: IUserRepository
+        private readonly userRepository: IUserRepository,
+
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService,
     ) { }
+
 
     // Method to get a user by ID
     async getById(id: string): Promise<User> {
@@ -41,28 +45,32 @@ export class UserService implements IUserService {
     }
 
     // Method to create a new user
-    async create(userData: CreateUserDto): Promise<User> {
+    async create(user: User): Promise<User> {
         // Check if the email or username already exists
-        const existingUser = await this.userRepository.findByEmail(userData.email);
+        const existingUser = await this.userRepository.findByEmail(user.email);
         if (existingUser) {
-            throw new ConflictException('Email is already in use');
+            this.logger.error(`Unable to create user [email=${user.email}]`);
+            throw new BadRequestException('Email is already in use');
         }
 
-        const user = new User();
-        user.name = userData.name;
-        user.fullname = userData.fullname;
-        user.email = userData.email;
-        user.username = userData.username;
-
         // Encrypt password before saving the user
-        await user.encryptPassword(userData.password);
+        await user.encryptPassword(user.chiperText);
 
-        const newUser = await this.userRepository.create(user);
-        return newUser;
+        try {
+            return await this.userRepository.create(user);
+        } catch (error) {
+            this.logger.error(`Unable to create user [email=${user.email}]: ${error.message}`, error.stack);
+
+            if (error.code === '23505') { // Unique violation error code
+                throw new ConflictException('Email or username already exists');
+            } else {
+                throw new BadRequestException('Failed to create user');
+            }
+        }
     }
 
     // Method to update an existing user's information
-    async update(id: string, userData: Partial<User>): Promise<User> {
+    async update(id: string, userData: Partial<User>): Promise<void> {
         const user = await this.userRepository.findById(id);
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
@@ -80,12 +88,16 @@ export class UserService implements IUserService {
         }
 
         // Save the updated user
-        const updatedUser = await this.userRepository.update(id, user);
-        if (!updatedUser) {
-            throw new NotFoundException(`Failed to update user with ID ${id}`);
+        try {
+            const updatedUser = await this.userRepository.update(id, user);
+            if (!updatedUser) {
+                throw new NotFoundException(`Failed to update user with ID ${id}`);
+            }
+        } catch (error) {
+            this.logger.error('Unable to update user', error.stack);
+            throw new BadRequestException('Failed to update user'); {
+            }
         }
-
-        return updatedUser;
     }
 
     // Method to delete a user by ID
@@ -95,6 +107,11 @@ export class UserService implements IUserService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        await this.userRepository.delete(id);
+        try {
+            await this.userRepository.delete(id);
+        } catch (error) {
+            this.logger.error('Unable to delete user', error.stack);
+            throw new BadRequestException('Failed to delete user');
+        }
     }
 }

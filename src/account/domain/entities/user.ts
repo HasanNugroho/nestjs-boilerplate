@@ -21,7 +21,7 @@ export class User {
     @Column('text')
     chiperText: string;
 
-    @Column('uuid')
+    @Column({ type: 'uuid', default: null, nullable: true })
     role_id: string;
 
     @Column({ type: 'boolean', default: true })
@@ -33,8 +33,23 @@ export class User {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 
+    new(name: string, fullname: string, username: string, email: string, password: string) {
+        this.name = name;
+        this.fullname = fullname;
+        this.username = username;
+        this.email = email;
+        this.chiperText = password;
+
+        return this;
+    }
+
     async encryptPassword(password: string): Promise<void> {
         const saltOrRounds = 10;
         this.chiperText = await bcrypt.hash(password, saltOrRounds);
+    }
+
+    toResponseObject() {
+        const { chiperText, ...userData } = this;
+        return userData;
     }
 }

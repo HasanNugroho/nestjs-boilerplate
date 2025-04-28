@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AccountModule } from './account/account.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import configuration from './factory/configuration';
-import { AppDataSource } from './factory/data-source';
+import configuration from './config/app.config';
+import { connectionSource } from './config/database.config';
+import { winstonLoggerConfig } from './config/logger.config';
+import { WinstonModule } from 'nest-winston';
+// import { AppDataSource } from './factory/data-source';
 
 @Module({
     imports: [
@@ -12,10 +15,11 @@ import { AppDataSource } from './factory/data-source';
             envFilePath: ['.env.development.local', '.env.development'],
             load: [configuration],
         }),
-        TypeOrmModule.forRoot(AppDataSource.options),
+        WinstonModule.forRoot(winstonLoggerConfig),
+        TypeOrmModule.forRoot(connectionSource.options),
         AccountModule,
     ],
     controllers: [],
-    providers: [],
+    providers: [Logger],
 })
 export class AppModule { }

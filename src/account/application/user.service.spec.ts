@@ -56,34 +56,36 @@ describe('UserService', () => {
 
     describe('create', () => {
         it('should create a user when email is not taken', async () => {
-            const dto: CreateUserDto = {
-                name: 'John',
-                fullname: 'John Doe',
-                username: 'johndoe',
-                email: 'john@example.com',
-                password: 'password123',
-            };
+            const data = new User();
+            data.new(
+                'John',
+                'John Doe',
+                'johndoe',
+                'jane@example.com',
+                'password123'
+            )
             repository.findByEmail.mockResolvedValueOnce(null);
             repository.create.mockImplementation(async (user: User) => user);
 
-            const user = await service.create(dto);
+            const user = await service.create(data);
 
-            expect(user.name).toBe(dto.name);
+            expect(user.name).toBe(data.name);
             expect(repository.create).toHaveBeenCalled();
         });
 
         it('should throw ConflictException if email already exists', async () => {
             repository.findByEmail.mockResolvedValueOnce(new User());
 
-            const dto: CreateUserDto = {
-                name: 'Jane',
-                fullname: 'Jane Doe',
-                username: 'janedoe',
-                email: 'jane@example.com',
-                password: 'password123',
-            };
+            const user = new User();
+            user.new(
+                'John',
+                'John Doe',
+                'johndoe',
+                'jane@example.com',
+                'password123'
+            )
 
-            await expect(service.create(dto)).rejects.toThrow(ConflictException);
+            await expect(service.create(user)).rejects.toThrow(ConflictException);
         });
     });
 
