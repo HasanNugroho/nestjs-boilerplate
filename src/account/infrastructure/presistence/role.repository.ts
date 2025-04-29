@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { IRoleRepository } from "src/account/domain/repository/role.repository.interface";
-import { Role } from "src/account/domain/entities/role";
+import { Role } from "src/account/domain/role";
 import { BaseQueryDto } from "src/common/dto/filter.dto";
 
 @Injectable()

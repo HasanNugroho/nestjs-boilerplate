@@ -7,7 +7,9 @@ export default () => ({
     desc: process.env.APP_DESC || 'NestJS Application',
     port: parseInt(process.env.PORT || '3000', 10),
     jwt: {
-        secret: process.env.JWT_SECRET
+        secret: process.env.JWT_SECRET_KEY,
+        expired: process.env.JWT_EXPIRES_IN || '1h',
+        refresh_expired: process.env.JWT_REFRESH_TOKEN_EXPIRED || '24h',
     },
     database: {
         host: process.env.DB_HOST,

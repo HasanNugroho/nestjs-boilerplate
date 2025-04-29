@@ -1,5 +1,5 @@
 import { BaseQueryDto } from "src/common/dto/filter.dto";
-import { Role } from "../entities/role";  // Pastikan Role adalah entity yang sesuai
+import { Role } from "../role";  // Pastikan Role adalah entity yang sesuai
 import { CreateRoleDto, UpdateRoleDto } from "src/account/presentation/dto/role.dto";
 
 /**

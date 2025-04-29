@@ -1,5 +1,5 @@
 import { BaseQueryDto } from "src/common/dto/filter.dto";
-import { Role } from "../entities/role";
+import { Role } from "../role";
 
 export interface IRoleRepository {
     /**

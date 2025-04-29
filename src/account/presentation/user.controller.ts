@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { IUserService } from '../domain/service/user.service.interface';
-import { User } from '../domain/entities/user';
+import { User } from '../domain/user';
 import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse } from '@nestjs/swagger';
 import { USER_SERVICE } from 'src/common/constant';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
@@ -29,8 +29,12 @@ export class UserController {
     })
     @Post()
     async create(@Body() payload: CreateUserDto) {
-        const result = await this.userService.create(payload);
-        return new ApiResponse(HttpStatus.CREATED, true, "create user successfully", result)
+        try {
+            const result = await this.userService.create(payload);
+            return new ApiResponse(HttpStatus.CREATED, true, "create user successfully", result)
+        } catch (error) {
+            throw error;
+        }
 
     }
 

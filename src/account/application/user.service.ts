@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Inject, Injectable, LoggerServi
 import { IUserService } from '../domain/service/user.service.interface';
 import { IUserRepository } from "../domain/repository/user.repository.interface";
 import { USER_REPOSITORY } from 'src/common/constant';
-import { User } from "../domain/entities/user";
+import { User } from "../domain/user";
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CreateUserDto, UpdateUserDto } from '../presentation/dto/user.dto';
 
@@ -47,25 +47,24 @@ export class UserService implements IUserService {
 
     // Method to create a new user
     async create(payload: CreateUserDto): Promise<void> {
-        // Check if the email or username already exists
-        const existingUser = await this.userRepository.findByEmail(payload.email);
-        if (existingUser) {
-            this.logger.error(`Unable to create user [email=${payload.email}]`);
-            throw new BadRequestException('Email is already in use');
-        }
-
-        const user = new User()
-        user.email = payload.email;
-        user.username = payload.username;
-        user.fullname = payload.fullname;
-        user.name = payload.name;
-        await user.encryptPassword(payload.password);
-
         try {
+            const existingUser = await this.userRepository.findByEmail(payload.email);
+            if (existingUser) {
+                this.logger.error(`Unable to create user [email=${payload.email}]`);
+                throw new BadRequestException('Email is already in use');
+            }
+
+            const user = new User()
+            user.email = payload.email;
+            user.username = payload.username;
+            user.fullname = payload.fullname;
+            user.name = payload.name;
+            await user.encryptPassword(payload.password);
+
             await this.userRepository.create(user);
             return
         } catch (error) {
-            this.logger.error(`Unable to create user [email=${user.email}]: ${error.message}`, error.stack);
+            this.logger.error(`Unable to create user: ${error.message}`, error.stack);
             throw error
         }
     }

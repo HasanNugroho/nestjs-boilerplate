@@ -4,7 +4,7 @@ import { ROLE_REPOSITORY } from '../../common/constant';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RoleService } from './role.service';
 import { IRoleRepository } from '../domain/repository/role.repository.interface';
-import { Role } from '../domain/entities/role';
+import { Role } from '../domain/role';
 import { CreateRoleDto, UpdateRoleDto } from '../presentation/dto/role.dto';
 import { BaseQueryDto } from 'src/common/dto/filter.dto';
 

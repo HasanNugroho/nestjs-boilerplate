@@ -1,5 +1,5 @@
 import { CreateUserDto, UpdateUserDto } from "src/account/presentation/dto/user.dto";
-import { User } from "../entities/user";
+import { User } from "../user";
 
 /**
  * Interface for the User service

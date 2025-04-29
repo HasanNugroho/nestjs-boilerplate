@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ConflictException, LoggerService, NotFoundException } from '@nestjs/common';
 import { IUserRepository } from '../domain/repository/user.repository.interface';
-import { User } from '../domain/entities/user';
+import { User } from '../domain/user';
 import { USER_REPOSITORY } from '../../common/constant';
 import { UserService } from './user.service';
 import { CreateUserDto } from '../presentation/dto/user.dto';
