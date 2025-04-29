@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { IUserService } from '../domain/service/user.service.interface';
 import { User } from '../domain/entities/user';
@@ -6,6 +6,7 @@ import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundRes
 import { USER_SERVICE } from 'src/common/constant';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { UuidParamDto } from 'src/common/dto/filter.dto';
+import { ApiResponse } from 'src/common/dto/response.dto';
 
 @Controller('api/users')
 export class UserController {
@@ -28,7 +29,9 @@ export class UserController {
     })
     @Post()
     async create(@Body() payload: CreateUserDto) {
-        return await this.userService.create(payload);
+        const result = await this.userService.create(payload);
+        return new ApiResponse(HttpStatus.CREATED, true, "create user successfully", result)
+
     }
 
     @ApiOperation({ summary: 'Get user by ID' })
@@ -38,7 +41,7 @@ export class UserController {
     @Get(':id')
     async getById(@Param() id: UuidParamDto) {
         const user = await this.userService.getById(id.id);
-        return user.toResponseObject();
+        return new ApiResponse(HttpStatus.CREATED, true, "fetch user(s) successfully", user.toResponseObject())
     }
 
     @ApiOperation({ summary: 'Update user by ID' })
@@ -50,7 +53,8 @@ export class UserController {
     })
     @Put(':id')
     async update(@Param() id: UuidParamDto, @Body() userData: UpdateUserDto) {
-        return this.userService.update(id.id, userData);
+        const result = await this.userService.update(id.id, userData);
+        return new ApiResponse(HttpStatus.CREATED, true, "update user successfully", result)
     }
 
     @ApiOperation({ summary: 'Delete user by ID' })
@@ -59,6 +63,7 @@ export class UserController {
     })
     @Delete(':id')
     async delete(@Param() id: UuidParamDto) {
-        return this.userService.delete(id.id);
+        const result = await this.userService.delete(id.id);
+        return new ApiResponse(HttpStatus.CREATED, true, "delete user successfully", result)
     }
 }

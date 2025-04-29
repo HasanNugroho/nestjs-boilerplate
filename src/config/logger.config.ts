@@ -5,6 +5,8 @@ import * as path from 'path';
 
 const logDir = path.join(__dirname, '../../logs');
 
+const isProduction = process.env.NODE_ENV === 'production'; // Cek apakah di lingkungan produksi
+
 export const winstonLoggerConfig: WinstonModuleOptions = {
     transports: [
         new winston.transports.Console({
@@ -14,7 +16,7 @@ export const winstonLoggerConfig: WinstonModuleOptions = {
                 winston.format.errors({ stack: true }),
                 winston.format.colorize(),
                 nestWinstonModuleUtilities.format.nestLike('MyAppName', { prettyPrint: true }),
-                winston.format.printf(({ timestamp, level, message, stack }) => {
+                isProduction ? winston.format.json() : winston.format.printf(({ timestamp, level, message, stack }) => {
                     return `${timestamp} - [${level}] - ${message} - ${stack || ''}`;
                 }),
             ),
@@ -26,8 +28,7 @@ export const winstonLoggerConfig: WinstonModuleOptions = {
             format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.errors({ stack: true }),
-                winston.format.json(),
-                winston.format.printf(({ timestamp, level, message, stack }) => {
+                isProduction ? winston.format.json() : winston.format.printf(({ timestamp, level, message, stack }) => {
                     return `${timestamp} - [${level}] - ${message} - ${stack || ''}`;
                 }),
             ),
@@ -39,8 +40,7 @@ export const winstonLoggerConfig: WinstonModuleOptions = {
             format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.errors({ stack: true }),
-                winston.format.json(),
-                winston.format.printf(({ timestamp, level, message, stack }) => {
+                isProduction ? winston.format.json() : winston.format.printf(({ timestamp, level, message, stack }) => {
                     return `${timestamp} - [${level}] - ${message} - ${stack || ''}`;
                 }),
             ),

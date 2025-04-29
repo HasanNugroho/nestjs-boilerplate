@@ -39,6 +39,9 @@ export class RoleService implements IRoleService {
      */
     async getAll(filter: BaseQueryDto): Promise<{ roles: Role[], totalCount: number }> {
         const { roles, totalCount } = await this.roleRepository.findAll(filter);
+        if (roles.length === 0) {
+            throw new NotFoundException('No roles found');
+        }
         return { roles, totalCount };
     }
 
@@ -56,8 +59,7 @@ export class RoleService implements IRoleService {
         }
 
         try {
-            this.roleRepository.create(role);
-            return
+            await this.roleRepository.create(role);
         } catch (error) {
             this.logger.error(`Unable to role [name=${role.name}]: ${error.message}`, error.stack);
             throw error;

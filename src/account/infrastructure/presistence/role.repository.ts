@@ -16,9 +16,6 @@ export class RoleRepository implements IRoleRepository {
         try {
             return await this.db.save(role);
         } catch (error) {
-            if (error.code === '23505') {
-                throw new ConflictException('Role already exists');
-            }
             throw new InternalServerErrorException('Database error on role creation');
         }
     }

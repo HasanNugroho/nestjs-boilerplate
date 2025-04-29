@@ -1,18 +1,17 @@
 export class ApiResponse<T> {
+    success: boolean;
     statusCode: number;
-    timestamp: string;
-    error: string;
     message: string | string[];
     data?: T; // Optionally include the response data
 
     constructor(
         statusCode: number,
-        error: string,
+        success: boolean,
         message: string | string[],
         data?: T
     ) {
         this.statusCode = statusCode;
-        this.error = error;
+        this.success = success;
         this.message = message;
         this.data = data;
     }

@@ -6,7 +6,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerConfig } from './config/logger.config';
-import { SuccessResponseInterceptor } from './common/interceptor/success-response.interceptor';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -33,7 +32,6 @@ async function bootstrap() {
  */
 function configureApp(app) {
     app.useGlobalPipes(new ValidationPipe());
-    app.useGlobalInterceptors(new SuccessResponseInterceptor())
     app.enableCors();
     app.useGlobalFilters(new HttpExceptionFilter());
 }
