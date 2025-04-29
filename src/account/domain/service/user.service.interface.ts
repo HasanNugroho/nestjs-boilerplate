@@ -1,3 +1,4 @@
+import { CreateUserDto, UpdateUserDto } from "src/account/presentation/dto/user.dto";
 import { User } from "../entities/user";
 
 /**
@@ -35,7 +36,7 @@ export interface IUserService {
      * @returns A promise that resolves to the newly created user object.
      * @throws ConflictException if the email or username already exists.
      */
-    create(userData: User): Promise<User>;
+    create(userData: CreateUserDto): Promise<void>;
 
     /**
      * Update an existing user's details.
@@ -44,7 +45,7 @@ export interface IUserService {
      * @returns A promise that resolves to the updated user object.
      * @throws NotFoundException if the user is not found.
      */
-    update(id: string, userData: Partial<User>): Promise<void>;
+    update(id: string, userData: UpdateUserDto): Promise<void>;
 
     /**
      * Delete a user by their ID.

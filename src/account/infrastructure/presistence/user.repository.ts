@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "src/account/domain/entities/user";
@@ -12,7 +12,14 @@ export class UserRepository implements IUserRepository {
     ) { }
 
     async create(user: User): Promise<User> {
-        return this.db.save(user);
+        try {
+            return this.db.save(user);
+        } catch (error) {
+            if (error.code === '23505') {
+                throw new ConflictException('Role already exists');
+            }
+            throw new InternalServerErrorException(error);
+        }
     }
 
     async findById(id: string): Promise<User | null> {
@@ -35,10 +42,19 @@ export class UserRepository implements IUserRepository {
         }
 
         Object.assign(existingUser, userData);
-        return this.db.save(existingUser);
+
+        try {
+            return this.db.save(existingUser);
+        } catch (error) {
+            throw new InternalServerErrorException(error);
+        }
     }
 
     async delete(id: string): Promise<void> {
-        await this.db.delete(id);
+        try {
+            await this.db.delete(id);
+        } catch (error) {
+            throw new InternalServerErrorException(error);
+        }
     }
 }

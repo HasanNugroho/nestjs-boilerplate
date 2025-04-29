@@ -1,15 +1,18 @@
 import { Logger, Module } from '@nestjs/common';
 import { UserService } from './application/user.service';
-import { USER_REPOSITORY, USER_SERVICE } from '../shared/constant';
-import { UserRepository } from './infrastructure/orm/user.repository';
+import { ROLE_REPOSITORY, ROLE_SERVICE, USER_REPOSITORY, USER_SERVICE } from '../common/constant';
+import { UserRepository } from './infrastructure/presistence/user.repository';
 import { User } from './domain/entities/user';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './presentation/user.controller';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { RoleController } from './presentation/role.controller';
+import { RoleService } from './application/role.service';
+import { RoleRepository } from './infrastructure/presistence/role.repository';
+import { Role } from './domain/entities/role';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User])],
-    controllers: [UserController],
+    imports: [TypeOrmModule.forFeature([User, Role])],
+    controllers: [UserController, RoleController],
     providers: [
         {
             provide: USER_SERVICE,
@@ -18,6 +21,14 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
         {
             provide: USER_REPOSITORY,
             useClass: UserRepository,
+        },
+        {
+            provide: ROLE_SERVICE,
+            useClass: RoleService,
+        },
+        {
+            provide: ROLE_REPOSITORY,
+            useClass: RoleRepository,
         },
     ],
 })

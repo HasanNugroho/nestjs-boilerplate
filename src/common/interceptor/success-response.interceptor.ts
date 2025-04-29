@@ -27,7 +27,7 @@ export class SuccessResponseInterceptor implements NestInterceptor {
                     }
                 }
 
-                return new ApiResponse(status, 'Success', context.switchToHttp().getRequest().url, data);
+                return new ApiResponse(status, 'OK', data);
             }),
         );
     }

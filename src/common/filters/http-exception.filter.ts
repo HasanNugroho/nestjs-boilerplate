@@ -7,7 +7,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     catch(exception: any, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest();
         const status = exception.getStatus();
         const exceptionResponse = exception.getResponse() as { message: string; errorCode?: number };
         let message = typeof exceptionResponse === 'string' ? exceptionResponse : exceptionResponse.message;
@@ -17,12 +16,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message = message.map(msg => msg.toString()).join(', ');
         }
 
+        message = (status == 500) ? 'internal server error' : message
 
         const errorResponse = new ApiResponse(
             status,
             errorText,
             message,
-            request.url,
             exception.response?.data
         );
 

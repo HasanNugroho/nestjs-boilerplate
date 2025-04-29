@@ -14,8 +14,6 @@ async function bootstrap() {
     });
     const configService = app.get(ConfigService);
 
-    app.useGlobalInterceptors(new SuccessResponseInterceptor())
-
     // Apply global pipes, filters, and CORS
     configureApp(app);
 
@@ -35,6 +33,7 @@ async function bootstrap() {
  */
 function configureApp(app) {
     app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalInterceptors(new SuccessResponseInterceptor())
     app.enableCors();
     app.useGlobalFilters(new HttpExceptionFilter());
 }

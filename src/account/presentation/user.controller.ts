@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { IUserService } from '../domain/service/user.service.interface';
-import { CreateUserDto } from '../domain/dto/user.dto';
 import { User } from '../domain/entities/user';
 import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse } from '@nestjs/swagger';
-import { USER_SERVICE } from 'src/shared/constant';
-import { UuidParamDto } from 'src/common/dto/uuid-param.dto';
+import { USER_SERVICE } from 'src/common/constant';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { UuidParamDto } from 'src/common/dto/filter.dto';
 
 @Controller('api/users')
 export class UserController {
@@ -28,11 +28,7 @@ export class UserController {
     })
     @Post()
     async create(@Body() payload: CreateUserDto) {
-        const user = new User();
-        user.new(payload.email, payload.fullname, payload.username, payload.email, payload.password);
-        const result = await this.userService.create(user);
-
-        return result.toResponseObject();
+        return await this.userService.create(payload);
     }
 
     @ApiOperation({ summary: 'Get user by ID' })
@@ -40,7 +36,7 @@ export class UserController {
         description: "User not found",
     })
     @Get(':id')
-    async getById(@Param('id') id: UuidParamDto) {
+    async getById(@Param() id: UuidParamDto) {
         const user = await this.userService.getById(id.id);
         return user.toResponseObject();
     }
@@ -53,7 +49,7 @@ export class UserController {
         description: "Bad request",
     })
     @Put(':id')
-    async update(@Param('id') id: UuidParamDto, @Body() userData: Partial<User>) {
+    async update(@Param() id: UuidParamDto, @Body() userData: UpdateUserDto) {
         return this.userService.update(id.id, userData);
     }
 
@@ -62,7 +58,7 @@ export class UserController {
         description: "User not found",
     })
     @Delete(':id')
-    async delete(@Param('id') id: UuidParamDto) {
+    async delete(@Param() id: UuidParamDto) {
         return this.userService.delete(id.id);
     }
 }

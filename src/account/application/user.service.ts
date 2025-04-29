@@ -1,9 +1,10 @@
 import { BadRequestException, ConflictException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { IUserService } from '../domain/service/user.service.interface';
 import { IUserRepository } from "../domain/repository/user.repository.interface";
-import { USER_REPOSITORY } from 'src/shared/constant';
+import { USER_REPOSITORY } from 'src/common/constant';
 import { User } from "../domain/entities/user";
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { CreateUserDto, UpdateUserDto } from '../presentation/dto/user.dto';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -45,32 +46,32 @@ export class UserService implements IUserService {
     }
 
     // Method to create a new user
-    async create(user: User): Promise<User> {
+    async create(payload: CreateUserDto): Promise<void> {
         // Check if the email or username already exists
-        const existingUser = await this.userRepository.findByEmail(user.email);
+        const existingUser = await this.userRepository.findByEmail(payload.email);
         if (existingUser) {
-            this.logger.error(`Unable to create user [email=${user.email}]`);
+            this.logger.error(`Unable to create user [email=${payload.email}]`);
             throw new BadRequestException('Email is already in use');
         }
 
-        // Encrypt password before saving the user
-        await user.encryptPassword(user.chiperText);
+        const user = new User()
+        user.email = payload.email;
+        user.username = payload.username;
+        user.fullname = payload.fullname;
+        user.name = payload.name;
+        await user.encryptPassword(payload.password);
 
         try {
-            return await this.userRepository.create(user);
+            await this.userRepository.create(user);
+            return
         } catch (error) {
             this.logger.error(`Unable to create user [email=${user.email}]: ${error.message}`, error.stack);
-
-            if (error.code === '23505') { // Unique violation error code
-                throw new ConflictException('Email or username already exists');
-            } else {
-                throw new BadRequestException('Failed to create user');
-            }
+            throw error
         }
     }
 
     // Method to update an existing user's information
-    async update(id: string, userData: Partial<User>): Promise<void> {
+    async update(id: string, userData: UpdateUserDto): Promise<void> {
         const user = await this.userRepository.findById(id);
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
@@ -80,19 +81,23 @@ export class UserService implements IUserService {
         user.name = userData.name || user.name;
         user.fullname = userData.fullname || user.fullname;
         user.email = userData.email || user.email;
-        user.username = userData.username || user.username;
 
-        // If password is provided, encrypt and update it
-        if (userData.chiperText) {
-            await user.encryptPassword(userData.chiperText);
+        // If password is provided, validate and encrypt it
+        if (userData.password) {
+            try {
+                user.validatePasswordHash(userData.password);
+                await user.encryptPassword(userData.password);
+            } catch (error) {
+                throw new BadRequestException('Invalid password format');
+            }
         }
 
-        // Save the updated user
         try {
             const updatedUser = await this.userRepository.update(id, user);
             if (!updatedUser) {
                 throw new NotFoundException(`Failed to update user with ID ${id}`);
             }
+            return
         } catch (error) {
             this.logger.error('Unable to update user', error.stack);
             throw new BadRequestException('Failed to update user'); {
@@ -109,6 +114,7 @@ export class UserService implements IUserService {
 
         try {
             await this.userRepository.delete(id);
+            return
         } catch (error) {
             this.logger.error('Unable to delete user', error.stack);
             throw new BadRequestException('Failed to delete user');

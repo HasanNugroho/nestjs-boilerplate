@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, LoggerService, NotFoundException } from '@nestjs/common';
 import { IUserRepository } from '../domain/repository/user.repository.interface';
 import { User } from '../domain/entities/user';
-import { CreateUserDto } from '../domain/dto/user.dto';
-import { USER_REPOSITORY } from '../../shared/constant';
+import { USER_REPOSITORY } from '../../common/constant';
 import { UserService } from './user.service';
+import { CreateUserDto } from '../presentation/dto/user.dto';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 
 describe('UserService', () => {
@@ -21,11 +22,24 @@ describe('UserService', () => {
             delete: jest.fn(),
         };
 
+        const loggerMock: jest.Mocked<LoggerService> = {
+            error: jest.fn(),
+            warn: jest.fn(),
+            log: jest.fn(),
+            debug: jest.fn(),
+            verbose: jest.fn(),
+            fatal: jest.fn(),
+        }
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 {
                     provide: USER_REPOSITORY,
                     useValue: repositoryMock,
+                },
+                {
+                    provide: WINSTON_MODULE_NEST_PROVIDER,
+                    useValue: loggerMock,
                 },
                 UserService,
             ],
@@ -56,36 +70,31 @@ describe('UserService', () => {
 
     describe('create', () => {
         it('should create a user when email is not taken', async () => {
-            const data = new User();
-            data.new(
-                'John',
-                'John Doe',
-                'johndoe',
-                'jane@example.com',
-                'password123'
-            )
+            const data = new CreateUserDto()
+            data.email = 'jane@example.com'
+            data.username = 'jhondoe'
+            data.fullname = 'jon doe'
+            data.name = 'joi'
+            data.password = 'password123'
             repository.findByEmail.mockResolvedValueOnce(null);
-            repository.create.mockImplementation(async (user: User) => user);
+            repository.create.mockImplementation(undefined);
 
-            const user = await service.create(data);
-
-            expect(user.name).toBe(data.name);
+            await expect(service.create(data)).resolves.not.toThrow();
+            expect(repository.findByEmail).toHaveBeenCalledWith('jane@example.com');
             expect(repository.create).toHaveBeenCalled();
         });
 
         it('should throw ConflictException if email already exists', async () => {
             repository.findByEmail.mockResolvedValueOnce(new User());
 
-            const user = new User();
-            user.new(
-                'John',
-                'John Doe',
-                'johndoe',
-                'jane@example.com',
-                'password123'
-            )
+            const user = new CreateUserDto()
+            user.email = 'jane@example.com'
+            user.username = 'jhondoe'
+            user.fullname = 'jon doe'
+            user.name = 'joi'
+            user.password = 'password123'
 
-            await expect(service.create(user)).rejects.toThrow(ConflictException);
+            await expect(service.create(user)).rejects.toThrow(BadRequestException);
         });
     });
 
@@ -96,9 +105,7 @@ describe('UserService', () => {
             repository.findById.mockResolvedValueOnce(user);
             repository.update.mockImplementation(async (_id: string, u: User) => u);
 
-            const updatedUser = await service.update('user-id', { name: 'New Name' });
-
-            expect(updatedUser.name).toBe('New Name');
+            await service.update('user-id', { name: 'New Name' });
             expect(repository.update).toHaveBeenCalled();
         });
 

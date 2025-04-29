@@ -1,0 +1,59 @@
+import { BaseQueryDto } from "src/common/dto/filter.dto";
+import { Role } from "../entities/role";
+
+export interface IRoleRepository {
+    /**
+     * Creates a new role in the system.
+     * 
+     * @param role - The role object to create.
+     * 
+     * @returns A promise that resolves when the role is created successfully.
+     */
+    create(role: Role): Promise<Role>;
+
+    /**
+     * Finds a role by its ID.
+     * 
+     * @param id - The ID of the role to find.
+     * 
+     * @returns A promise that resolves to the role with the given ID, or null if not found.
+     */
+    findById(id: string): Promise<Role | null>;
+
+    /**
+     * Finds multiple roles by their IDs.
+     * 
+     * @param ids - An array of role IDs to find.
+     * 
+     * @returns A promise that resolves to an array of roles with the given IDs, or null if not found.
+     */
+    findManyById(ids: string[]): Promise<Role[] | null>;
+
+    /**
+     * Finds all roles with a pagination filter.
+     * 
+     * @param filter - The pagination filter to apply (including page number, page size, etc.).
+     * 
+     * @returns A promise that resolves to an object containing the roles and total count of roles.
+     */
+    findAll(filter: BaseQueryDto): Promise<{ roles: Role[], totalCount: number }>;
+
+    /**
+     * Updates an existing role by its ID.
+     * 
+     * @param id - The ID of the role to update.
+     * @param role - The updated role data.
+     * 
+     * @returns A promise that resolves when the role is updated successfully.
+     */
+    update(id: string, role: Role): Promise<void>;
+
+    /**
+     * Deletes a role by its ID.
+     * 
+     * @param id - The ID of the role to delete.
+     * 
+     * @returns A promise that resolves when the role is deleted successfully.
+     */
+    delete(id: string): Promise<void>;
+}

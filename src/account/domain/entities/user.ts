@@ -48,6 +48,10 @@ export class User {
         this.chiperText = await bcrypt.hash(password, saltOrRounds);
     }
 
+    async validatePasswordHash(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.chiperText);
+    }
+
     toResponseObject() {
         const { chiperText, ...userData } = this;
         return userData;
