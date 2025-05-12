@@ -1,4 +1,4 @@
-import { PaginationOptionsDto } from "src/common/dto/page-option.dto";
+import { PaginationOptionsDto } from "src/common/dtos/page-option.dto";
 import { Role } from "../role";  // Pastikan Role adalah entity yang sesuai
 import { CreateRoleDto, UpdateRoleDto } from "src/account/presentation/dto/role.dto";
 

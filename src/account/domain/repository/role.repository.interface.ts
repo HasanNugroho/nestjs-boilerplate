@@ -1,4 +1,4 @@
-import { PaginationOptionsDto } from "src/common/dto/page-option.dto";
+import { PaginationOptionsDto } from "src/common/dtos/page-option.dto";
 import { Role } from "../role";
 
 export interface IRoleRepository {

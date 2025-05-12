@@ -5,7 +5,7 @@ import { ROLE_REPOSITORY } from 'src/common/constant';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Role } from '../../domain/role';
 import { CreateRoleDto, UpdateRoleDto } from '../../presentation/dto/role.dto';
-import { PaginationOptionsDto } from 'src/common/dto/page-option.dto';
+import { PaginationOptionsDto } from 'src/common/dtos/page-option.dto';
 
 @Injectable()
 export class RoleService implements IRoleService {

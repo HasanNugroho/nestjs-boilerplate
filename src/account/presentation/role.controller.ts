@@ -3,8 +3,8 @@ import { ROLE_SERVICE } from 'src/common/constant';
 import { IRoleService } from '../domain/service/role.service.interface';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { CreateRoleDto, UpdateRoleDto } from './dto/role.dto';
-import { HttpResponse } from 'src/common/dto/response.dto';
-import { PaginationOptionsDto } from 'src/common/dto/page-option.dto';
+import { HttpResponse } from 'src/common/dtos/response.dto';
+import { PaginationOptionsDto } from 'src/common/dtos/page-option.dto';
 
 
 @Controller('api/roles')

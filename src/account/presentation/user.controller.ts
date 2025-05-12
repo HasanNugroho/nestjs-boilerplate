@@ -5,7 +5,7 @@ import { User } from '../domain/user';
 import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { USER_SERVICE } from 'src/common/constant';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { HttpResponse } from 'src/common/dto/response.dto';
+import { HttpResponse } from 'src/common/dtos/response.dto';
 
 @ApiBearerAuth()
 @Controller('api/users')
