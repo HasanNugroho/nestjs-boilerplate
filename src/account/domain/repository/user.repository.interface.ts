@@ -2,25 +2,25 @@ import { User } from "../user";
 
 export interface IUserRepository {
     /**
-     * @param id - The ID of the user to find
+     * @param id - The ID of the user to get
      * 
      * @returns The user with the given ID, or null if not found
      */
-    findById(id: string): Promise<User | null>;
+    getById(id: string): Promise<User | null>;
 
     /**
-     * @param email - The email of the user to find 
+     * @param email - The email of the user to get 
      * 
      * @returns The user with the given email, or null if not found
      */
-    findByEmail(email: string): Promise<User | null>;
+    getByEmail(email: string): Promise<User | null>;
 
     /**
-     * @param username - The username of the user to find 
+     * @param username - The username of the user to get 
      * 
      * @returns The user with the given username, or null if not found
      */
-    findByUsername(username: string): Promise<User | null>;
+    getByUsername(username: string): Promise<User | null>;
 
     /**
      * @param user - The user to create

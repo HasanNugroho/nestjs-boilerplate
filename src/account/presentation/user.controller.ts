@@ -1,13 +1,13 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { IUserService } from '../domain/service/user.service.interface';
 import { User } from '../domain/user';
-import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { USER_SERVICE } from 'src/common/constant';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { UuidParamDto } from 'src/common/dto/filter.dto';
-import { ApiResponse } from 'src/common/dto/response.dto';
+import { HttpResponse } from 'src/common/dto/response.dto';
 
+@ApiBearerAuth()
 @Controller('api/users')
 export class UserController {
     constructor(
@@ -31,7 +31,7 @@ export class UserController {
     async create(@Body() payload: CreateUserDto) {
         try {
             const result = await this.userService.create(payload);
-            return new ApiResponse(HttpStatus.CREATED, true, "create user successfully", result)
+            return new HttpResponse(HttpStatus.CREATED, true, "create user successfully", result)
         } catch (error) {
             throw error;
         }
@@ -43,9 +43,9 @@ export class UserController {
         description: "User not found",
     })
     @Get(':id')
-    async getById(@Param() id: UuidParamDto) {
-        const user = await this.userService.getById(id.id);
-        return new ApiResponse(HttpStatus.CREATED, true, "fetch user(s) successfully", user.toResponseObject())
+    async getById(@Param('id', new ParseUUIDPipe()) id: string) {
+        const user = await this.userService.getById(id);
+        return new HttpResponse(HttpStatus.CREATED, true, "fetch user(s) successfully", user.toResponse())
     }
 
     @ApiOperation({ summary: 'Update user by ID' })
@@ -56,9 +56,9 @@ export class UserController {
         description: "Bad request",
     })
     @Put(':id')
-    async update(@Param() id: UuidParamDto, @Body() userData: UpdateUserDto) {
-        const result = await this.userService.update(id.id, userData);
-        return new ApiResponse(HttpStatus.CREATED, true, "update user successfully", result)
+    async update(@Param('id', new ParseUUIDPipe()) id: string, @Body() userData: UpdateUserDto) {
+        const result = await this.userService.update(id, userData);
+        return new HttpResponse(HttpStatus.CREATED, true, "update user successfully", result)
     }
 
     @ApiOperation({ summary: 'Delete user by ID' })
@@ -66,8 +66,8 @@ export class UserController {
         description: "User not found",
     })
     @Delete(':id')
-    async delete(@Param() id: UuidParamDto) {
-        const result = await this.userService.delete(id.id);
-        return new ApiResponse(HttpStatus.CREATED, true, "delete user successfully", result)
+    async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+        const result = await this.userService.delete(id);
+        return new HttpResponse(HttpStatus.CREATED, true, "delete user successfully", result)
     }
 }

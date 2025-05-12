@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn('uuid')
+    @Index()
     id: string;
 
     @Column()
@@ -13,15 +14,18 @@ export class User {
     fullname: string;
 
     @Column({ unique: true })
+    @Index()
     username: string;
 
     @Column({ unique: true })
+    @Index()
     email: string;
 
     @Column('text')
     chiperText: string;
 
     @Column({ type: 'uuid', default: null, nullable: true })
+    @Index()
     role_id: string;
 
     @Column({ type: 'boolean', default: true })
@@ -52,7 +56,7 @@ export class User {
         return bcrypt.compare(password, this.chiperText);
     }
 
-    toResponseObject() {
+    toResponse() {
         const { chiperText, ...userData } = this;
         return userData;
     }

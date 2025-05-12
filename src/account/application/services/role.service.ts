@@ -1,11 +1,11 @@
 import { BadRequestException, ConflictException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { IRoleRepository } from '../domain/repository/role.repository.interface';
-import { IRoleService } from '../domain/service/role.service.interface';
+import { IRoleRepository } from '../../domain/repository/role.repository.interface';
+import { IRoleService } from '../../domain/service/role.service.interface';
 import { ROLE_REPOSITORY } from 'src/common/constant';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { Role } from '../domain/role';
-import { CreateRoleDto, UpdateRoleDto } from '../presentation/dto/role.dto';
-import { BaseQueryDto } from 'src/common/dto/filter.dto';
+import { Role } from '../../domain/role';
+import { CreateRoleDto, UpdateRoleDto } from '../../presentation/dto/role.dto';
+import { PaginationOptionsDto } from 'src/common/dto/page-option.dto';
 
 @Injectable()
 export class RoleService implements IRoleService {
@@ -37,7 +37,7 @@ export class RoleService implements IRoleService {
      * @param filter - The pagination filter.
      * @returns A promise that resolves to the list of roles and the total count.
      */
-    async getAll(filter: BaseQueryDto): Promise<{ roles: Role[], totalCount: number }> {
+    async getAll(filter: PaginationOptionsDto): Promise<{ roles: Role[], totalCount: number }> {
         const { roles, totalCount } = await this.roleRepository.findAll(filter);
         if (roles.length === 0) {
             throw new NotFoundException('No roles found');

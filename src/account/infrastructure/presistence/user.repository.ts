@@ -22,15 +22,15 @@ export class UserRepository implements IUserRepository {
         }
     }
 
-    async findById(id: string): Promise<User | null> {
+    async getById(id: string): Promise<User | null> {
         return this.db.findOne({ where: { id } });
     }
 
-    async findByEmail(email: string): Promise<User | null> {
+    async getByEmail(email: string): Promise<User | null> {
         return this.db.findOne({ where: { email } });
     }
 
-    async findByUsername(username: string): Promise<User | null> {
+    async getByUsername(username: string): Promise<User | null> {
         return this.db.findOne({ where: { username } });
     }
 

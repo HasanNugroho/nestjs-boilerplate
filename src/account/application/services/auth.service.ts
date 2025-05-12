@@ -1,10 +1,10 @@
 import { BadRequestException, ConflictException, Inject, Injectable, LoggerService, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { IUserRepository } from "../domain/repository/user.repository.interface";
+import { IUserRepository } from "../../domain/repository/user.repository.interface";
 import { USER_REPOSITORY } from 'src/common/constant';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { IAuthService } from '../domain/service/auth.service.interface';
-import { Credential, CredentialResponse } from '../domain/credential';
-import { User } from '../domain/user';
+import { IAuthService } from '../../domain/service/auth.service.interface';
+import { Credential, CredentialResponse } from '../../domain/credential';
+import { User } from '../../domain/user';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
@@ -29,18 +29,16 @@ export class AuthService implements IAuthService {
 
         try {
             const user = credentialInstance.isEmailIdentifier()
-                ? await this.userRepository.findByEmail(identifier)
-                : await this.userRepository.findByUsername(identifier);
+                ? await this.userRepository.getByEmail(identifier)
+                : await this.userRepository.getByUsername(identifier);
 
             if (!user) {
                 throw new UnauthorizedException('Invalid identifier or password');
             }
 
-            const isPasswordValid = await user.validatePasswordHash(password);
-            if (!isPasswordValid) {
+            if (!user || !(await user.validatePasswordHash(password))) {
                 throw new UnauthorizedException('Invalid identifier or password');
             }
-
             return this.generateTokens(user.id);
         } catch (error) {
             this.logger.error(`Unable to login [identifier=${credential.identifier}]`, error.stack);

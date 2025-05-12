@@ -1,14 +1,13 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
-import { IUserService } from '../domain/service/user.service.interface';
-import { User } from '../domain/user';
-import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiBadRequestResponse, ApiUnauthorizedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AUTH_SERVICE } from 'src/common/constant';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { UuidParamDto } from 'src/common/dto/filter.dto';
-import { ApiResponse } from 'src/common/dto/response.dto';
+import { HttpResponse } from 'src/common/dto/response.dto';
 import { IAuthService } from '../domain/service/auth.service.interface';
 import { Credential } from '../domain/credential';
+import { CurrentUser } from 'src/common/decorator/user.decorator';
+import { User } from '../domain/user';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -24,15 +23,20 @@ export class AuthController {
     @ApiUnauthorizedResponse({
         description: "invalid identifier or password",
     })
+    @Public()
     @Post()
     async create(@Body() payload: Credential) {
         try {
             const result = await this.authService.login(payload);
-            return new ApiResponse(HttpStatus.OK, true, "user logged successfully", result)
+            return new HttpResponse(HttpStatus.OK, true, "user logged successfully", result)
         } catch (error) {
             throw error;
         }
     }
 
-
+    @ApiBearerAuth()
+    @Get('me')
+    async me(@CurrentUser() user: User) {
+        return new HttpResponse(200, true, 'fetch user successfully', user.toResponse())
+    }
 }

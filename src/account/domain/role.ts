@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -9,6 +9,7 @@ const permissionsData = JSON.parse(
 @Entity('roles')
 export class Role {
     @PrimaryGeneratedColumn('uuid')
+    @Index()
     id: string;
 
     @Column()

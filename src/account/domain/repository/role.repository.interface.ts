@@ -1,4 +1,4 @@
-import { BaseQueryDto } from "src/common/dto/filter.dto";
+import { PaginationOptionsDto } from "src/common/dto/page-option.dto";
 import { Role } from "../role";
 
 export interface IRoleRepository {
@@ -36,7 +36,7 @@ export interface IRoleRepository {
      * 
      * @returns A promise that resolves to an object containing the roles and total count of roles.
      */
-    findAll(filter: BaseQueryDto): Promise<{ roles: Role[], totalCount: number }>;
+    findAll(filter: PaginationOptionsDto): Promise<{ roles: Role[], totalCount: number }>;
 
     /**
      * Updates an existing role by its ID.

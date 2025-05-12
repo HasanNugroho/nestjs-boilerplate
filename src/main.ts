@@ -31,7 +31,10 @@ async function bootstrap() {
  * @param app The NestJS application instance
  */
 function configureApp(app) {
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({
+        transform: true,
+        whitelist: true,
+    }));
     app.enableCors();
     app.useGlobalFilters(new HttpExceptionFilter());
 }
@@ -60,6 +63,7 @@ function setupSwagger(app, config: { name: string, desc: string, version: string
         .setTitle(config.name)
         .setDescription(config.desc)
         .setVersion(config.version)
+        .addBearerAuth()
         .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);

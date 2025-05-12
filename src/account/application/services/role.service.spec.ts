@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, LoggerService, NotFoundException } from '@nestjs/common';
-import { ROLE_REPOSITORY } from '../../common/constant';
+import { ROLE_REPOSITORY } from '../../../common/constant';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RoleService } from './role.service';
-import { IRoleRepository } from '../domain/repository/role.repository.interface';
-import { Role } from '../domain/role';
-import { CreateRoleDto, UpdateRoleDto } from '../presentation/dto/role.dto';
-import { BaseQueryDto } from 'src/common/dto/filter.dto';
+import { IRoleRepository } from '../../domain/repository/role.repository.interface';
+import { Role } from '../../domain/role';
+import { CreateRoleDto, UpdateRoleDto } from '../../presentation/dto/role.dto';
+import { PaginationOptionsDto } from 'src/common/dto/page-option.dto';
+import { Order } from 'src/common/enums/order.enum';
 
 describe('RoleService', () => {
     let service: RoleService;
@@ -97,11 +98,11 @@ describe('RoleService', () => {
             const expectedResult = { roles: [role], totalCount: 1 };
             repository.findAll.mockResolvedValueOnce(expectedResult);
 
-            const filter = new BaseQueryDto()
+            const filter = new PaginationOptionsDto()
             filter.page = 1
             filter.limit = 10
-            filter.sortBy = 'created_at';
-            filter.sortOrder = 'asc';
+            filter.orderby = 'created_at';
+            filter.order = Order.ASC;
 
             // Act
             const result = await service.getAll(filter);

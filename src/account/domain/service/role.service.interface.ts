@@ -1,4 +1,4 @@
-import { BaseQueryDto } from "src/common/dto/filter.dto";
+import { PaginationOptionsDto } from "src/common/dto/page-option.dto";
 import { Role } from "../role";  // Pastikan Role adalah entity yang sesuai
 import { CreateRoleDto, UpdateRoleDto } from "src/account/presentation/dto/role.dto";
 
@@ -20,7 +20,7 @@ export interface IRoleService {
      * @param filter - The pagination filter.
      * @returns A promise that resolves to the list of roles and the total count.
      */
-    getAll(filter: BaseQueryDto): Promise<{ roles: Role[], totalCount: number }>;
+    getAll(filter: PaginationOptionsDto): Promise<{ roles: Role[], totalCount: number }>;
 
     /**
      * Create a new role.

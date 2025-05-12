@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { IRoleRepository } from "src/account/domain/repository/role.repository.interface";
 import { Role } from "src/account/domain/role";
-import { BaseQueryDto } from "src/common/dto/filter.dto";
+import { PaginationOptionsDto } from "src/common/dto/page-option.dto";
 
 @Injectable()
 export class RoleRepository implements IRoleRepository {
@@ -24,7 +24,7 @@ export class RoleRepository implements IRoleRepository {
         return this.db.findOne({ where: { id } });
     }
 
-    async findAll(filter: BaseQueryDto): Promise<{ roles: Role[]; totalCount: number; }> {
+    async findAll(filter: PaginationOptionsDto): Promise<{ roles: Role[]; totalCount: number; }> {
         const where: FindOptionsWhere<Role> = {};
         const offset = (filter.page - 1) * filter.limit;
 
@@ -35,7 +35,7 @@ export class RoleRepository implements IRoleRepository {
         const [roles, totalCount] = await this.db.findAndCount({
             where,
             order: {
-                [filter.sortBy || 'created_at']: filter.sortOrder || 'DESC',
+                [filter.orderby || 'created_at']: filter.order || 'DESC',
             },
             skip: offset,
             take: filter.limit,

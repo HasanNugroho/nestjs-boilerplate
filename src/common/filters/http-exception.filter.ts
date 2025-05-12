@@ -1,6 +1,12 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus, HttpException } from '@nestjs/common';
+import {
+    ExceptionFilter,
+    Catch,
+    ArgumentsHost,
+    HttpException,
+    HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
-import { ApiResponse } from '../dto/response.dto';
+import { HttpResponse } from '../dto/response.dto';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -8,26 +14,56 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
 
-        let status = HttpStatus.INTERNAL_SERVER_ERROR; // Default to 500
-        let message = 'Internal server error'; // Default message
+        const { status, message } = this.resolveExceptionData(exception)
+
+        console.error('exception:', exception);
+        const errorResponse = new HttpResponse(
+            status,
+            false,
+            message,
+            undefined,
+        );
+
+        response.status(status).json(errorResponse);
+    }
+
+    resolveExceptionData(exception: any): { status: number; message: string } {
+        const defaultStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        const defaultMessage = 'Internal server error';
 
         if (exception instanceof HttpException) {
-            status = exception.getStatus();
-            const exceptionResponse = exception.getResponse() as { message: string; errorCode?: number };
-            message = typeof exceptionResponse === 'string' ? exceptionResponse : exceptionResponse.message;
+            const status = exception.getStatus();
+            const res = exception.getResponse();
+
+            if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+                return { status, message: defaultMessage };
+            }
+
+            let message: string | string[] = defaultMessage;
+            if (typeof res === 'string') {
+                message = res;
+            } else if (typeof res === 'object') {
+                const { message: msg } = res as any;
+                message = msg ?? message;
+            }
 
             if (Array.isArray(message)) {
                 message = message.map(msg => msg.toString()).join(', ');
             }
+
+            return { status, message }
         }
 
-        const errorResponse = new ApiResponse(
-            status,
-            false,
-            message,
-            exception.response?.data
-        );
+        const errorWithMessage = exception as { message?: unknown };
+        const message = errorWithMessage?.message
+            ? String(errorWithMessage.message)
+            : defaultMessage;
 
-        response.status(status).json(errorResponse);
+        console.error('Unhandled exception:', exception);
+
+        return {
+            status: defaultStatus,
+            message
+        };
     }
 }
