@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Init1747069078026 implements MigrationInterface {
-    name = 'Init1747069078026'
+export class Init1748441125912 implements MigrationInterface {
+    name = 'Init1748441125912'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -11,9 +11,9 @@ export class Init1747069078026 implements MigrationInterface {
                 "fullname" character varying NOT NULL,
                 "username" character varying NOT NULL,
                 "email" character varying NOT NULL,
-                "chiperText" text NOT NULL,
+                "chiper_text" text NOT NULL,
                 "role_id" uuid,
-                "isActive" boolean NOT NULL DEFAULT true,
+                "is_active" boolean NOT NULL DEFAULT true,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"),
@@ -39,7 +39,7 @@ export class Init1747069078026 implements MigrationInterface {
                 "name" character varying NOT NULL,
                 "description" character varying NOT NULL,
                 "access" character varying NOT NULL,
-                "isActive" boolean NOT NULL DEFAULT true,
+                "is_active" boolean NOT NULL DEFAULT true,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "PK_c1433d71a4838793a49dcad46ab" PRIMARY KEY ("id")

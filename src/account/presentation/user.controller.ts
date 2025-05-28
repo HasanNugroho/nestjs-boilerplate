@@ -6,6 +6,7 @@ import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundRes
 import { USER_SERVICE } from 'src/common/constant';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { HttpResponse } from 'src/common/dtos/response.dto';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @ApiBearerAuth()
 @Controller('api/users')
@@ -28,6 +29,7 @@ export class UserController {
         description: "Email or username already exists",
     })
     @Post()
+    @Public()
     async create(@Body() payload: CreateUserDto) {
         try {
             const result = await this.userService.create(payload);

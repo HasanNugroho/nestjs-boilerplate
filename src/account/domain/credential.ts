@@ -16,24 +16,24 @@ export class Credential {
     @IsString()
     password: string;
 
-    isEmailIdentifier(): boolean {
+    isEmail(): boolean {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(this.identifier);
     }
 }
 
 export class CredentialResponse {
-    accessToken: string;
-    refreshToken: string;
+    access_token: string;
+    refresh_token: string;
     id: string;
 
     constructor(
-        accessToken: string,
-        refreshToken: string,
+        access_token: string,
+        refresh_token: string,
         id: string,
     ) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
+        this.access_token = access_token;
+        this.refresh_token = refresh_token;
         this.id = id;
     }
 }

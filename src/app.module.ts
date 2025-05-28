@@ -9,7 +9,9 @@ import { WinstonModule } from 'nest-winston';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './account/application/guards/auth.guard';
-// import { AppDataSource } from './factory/data-source';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { CacheModule } from '@nestjs/cache-manager';
+import { KeyvOptions } from './config/redis.config';
 
 @Module({
     imports: [
@@ -18,6 +20,7 @@ import { AuthGuard } from './account/application/guards/auth.guard';
             envFilePath: ['.env.development.local', '.env.development', '.env'],
             load: [configuration],
         }),
+        CacheModule.registerAsync(KeyvOptions),
         WinstonModule.forRoot(winstonLoggerConfig),
         TypeOrmModule.forRoot(connectionSource.options),
         EventEmitterModule.forRoot(),
@@ -29,7 +32,8 @@ import { AuthGuard } from './account/application/guards/auth.guard';
             provide: APP_GUARD,
             useClass: AuthGuard,
         },
-        Logger
+        Logger,
+        HttpExceptionFilter,
     ],
 })
 export class AppModule { }

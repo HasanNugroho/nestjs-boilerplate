@@ -4,19 +4,35 @@ import {
     ArgumentsHost,
     HttpException,
     HttpStatus,
+    LoggerService,
+    Inject,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { HttpResponse } from '../dtos/response.dto';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import * as util from 'util';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+    constructor(
+        @Inject(WINSTON_MODULE_NEST_PROVIDER)
+        private readonly logger: LoggerService,
+    ) { }
+
     catch(exception: any, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
 
         const { status, message } = this.resolveExceptionData(exception)
 
-        console.error('exception:', exception);
+        this.logger.error(message, {
+            status,
+            message,
+            exception: util.inspect(exception, { depth: null }),
+            stack: exception.stack,
+            timestamp: new Date().toISOString(),
+        });
+
         const errorResponse = new HttpResponse(
             status,
             false,

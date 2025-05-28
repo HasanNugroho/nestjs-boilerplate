@@ -14,7 +14,7 @@ Typescript backend template with NestJS and PostgreSQL
 
 Clone this project:
 ```shell script
-git clone https://github.com/HasanNugroho/nestjs-boilerplate
+git clone https://github.com/HasanNugroho/nestjs-boilerplate.git
 cd nestjs-boilerplate
 ```
 

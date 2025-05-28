@@ -20,11 +20,11 @@ export class RoleRepository implements IRoleRepository {
         }
     }
 
-    async findById(id: string): Promise<Role | null> {
+    async getById(id: string): Promise<Role | null> {
         return this.db.findOne({ where: { id } });
     }
 
-    async findAll(filter: PaginationOptionsDto): Promise<{ roles: Role[]; totalCount: number; }> {
+    async getAll(filter: PaginationOptionsDto): Promise<{ roles: Role[]; totalCount: number; }> {
         const where: FindOptionsWhere<Role> = {};
         const offset = (filter.page - 1) * filter.limit;
 
@@ -44,7 +44,7 @@ export class RoleRepository implements IRoleRepository {
         return { roles, totalCount };
     }
 
-    async findManyById(ids: string[]): Promise<Role[] | null> {
+    async getManyById(ids: string[]): Promise<Role[] | null> {
         return this.db.findBy({
             id: In(ids)
         })

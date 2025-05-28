@@ -13,9 +13,11 @@ export interface IAuthService {
 
     /**
      * Log out current user session.
+     * @param accessToken - Access token string
+     * @param refreshToken - Refresh token string
      * @returns Void
      */
-    logout(): Promise<void>;
+    logout(accessToken: string, refreshToken: string): Promise<void>;
 
     /**
      * Generate new access and refresh tokens using refresh token.
@@ -23,7 +25,7 @@ export interface IAuthService {
      * @param refreshToken - Refresh token string
      * @returns New access and refresh tokens
      */
-    refreshToken(userId: string, refreshToken: string): Promise<CredentialResponse>;
+    refreshToken(refreshToken: string): Promise<CredentialResponse>;
 
     /**
      * Reset user password using reset token.

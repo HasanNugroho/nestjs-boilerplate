@@ -22,7 +22,7 @@ export class Role {
     access: string;
 
     @Column({ type: 'boolean', default: true })
-    isActive: boolean;
+    is_active: boolean;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;

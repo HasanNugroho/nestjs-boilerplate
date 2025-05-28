@@ -16,12 +16,12 @@ describe('RoleService', () => {
     beforeEach(async () => {
         // Create repository mock with all required methods
         const repositoryMock: jest.Mocked<IRoleRepository> = {
-            findById: jest.fn(),
+            getById: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
-            findAll: jest.fn(),
-            findManyById: jest.fn()
+            getAll: jest.fn(),
+            getManyById: jest.fn()
         };
 
         // Create logger mock with all required methods
@@ -65,19 +65,19 @@ describe('RoleService', () => {
                 "roles:create",
                 "roles:read"
             ]);
-            repository.findById.mockResolvedValueOnce(role);
+            repository.getById.mockResolvedValueOnce(role);
 
             // Act
             const result = await service.getById('role-id');
 
             // Assert
             expect(result).toBe(role);
-            expect(repository.findById).toHaveBeenCalledWith('role-id');
+            expect(repository.getById).toHaveBeenCalledWith('role-id');
         });
 
         it('should throw NotFoundException if role not found', async () => {
             // Arrange
-            repository.findById.mockResolvedValueOnce(null);
+            repository.getById.mockResolvedValueOnce(null);
 
             // Act & Assert
             await expect(service.getById('wrong-id')).rejects.toThrow(NotFoundException);
@@ -96,7 +96,7 @@ describe('RoleService', () => {
                 "roles:read"
             ]);
             const expectedResult = { roles: [role], totalCount: 1 };
-            repository.findAll.mockResolvedValueOnce(expectedResult);
+            repository.getAll.mockResolvedValueOnce(expectedResult);
 
             const filter = new PaginationOptionsDto()
             filter.page = 1
@@ -109,7 +109,7 @@ describe('RoleService', () => {
 
             // Assert
             expect(result).toEqual(expectedResult);
-            expect(repository.findAll).toHaveBeenCalledWith(filter);
+            expect(repository.getAll).toHaveBeenCalledWith(filter);
         });
     });
 
@@ -153,7 +153,7 @@ describe('RoleService', () => {
             // Arrange
             const role = new Role();
             role.id = 'role-id';
-            repository.findById.mockResolvedValueOnce(role);
+            repository.getById.mockResolvedValueOnce(role);
             repository.update.mockImplementation(async () => Promise.resolve());
 
             // Act
@@ -167,7 +167,7 @@ describe('RoleService', () => {
             // Arrange
             const role = new Role();
             role.id = 'role-id';
-            repository.findById.mockResolvedValueOnce(role);
+            repository.getById.mockResolvedValueOnce(role);
 
             const updatedData = new UpdateRoleDto();
             updatedData.name = 'admin';
@@ -184,7 +184,7 @@ describe('RoleService', () => {
 
         it('should throw NotFoundException if role not found for update', async () => {
             // Arrange
-            repository.findById.mockResolvedValueOnce(null);
+            repository.getById.mockResolvedValueOnce(null);
 
             // Act & Assert
             await expect(service.update('wrong-id', {})).rejects.toThrow(NotFoundException);
@@ -195,7 +195,7 @@ describe('RoleService', () => {
         it('should delete role if exists', async () => {
             // Arrange
             const role = new Role();
-            repository.findById.mockResolvedValueOnce(role);
+            repository.getById.mockResolvedValueOnce(role);
             repository.delete.mockResolvedValueOnce();
 
             // Act
@@ -207,7 +207,7 @@ describe('RoleService', () => {
 
         it('should throw NotFoundException if role to delete not found', async () => {
             // Arrange
-            repository.findById.mockResolvedValueOnce(null);
+            repository.getById.mockResolvedValueOnce(null);
 
             // Act & Assert
             await expect(service.delete('wrong-id')).rejects.toThrow(NotFoundException);

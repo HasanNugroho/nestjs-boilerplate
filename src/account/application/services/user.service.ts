@@ -11,9 +11,6 @@ export class UserService implements IUserService {
     constructor(
         @Inject(USER_REPOSITORY)
         private readonly userRepository: IUserRepository,
-
-        @Inject(WINSTON_MODULE_NEST_PROVIDER)
-        private readonly logger: LoggerService,
     ) { }
 
 
@@ -27,7 +24,6 @@ export class UserService implements IUserService {
 
             return user;
         } catch (err) {
-            this.logger.error(err)
             throw err;
         }
     }
@@ -41,7 +37,6 @@ export class UserService implements IUserService {
 
             return user;
         } catch (err) {
-            this.logger.error(err)
             throw err;
         }
     }
@@ -55,7 +50,6 @@ export class UserService implements IUserService {
 
             return user;
         } catch (err) {
-            this.logger.error(err)
             throw err;
         }
     }
@@ -65,7 +59,6 @@ export class UserService implements IUserService {
         try {
             const existingUser = await this.userRepository.getByEmail(payload.email);
             if (existingUser) {
-                this.logger.error(`Unable to create user [email=${payload.email}]`);
                 throw new BadRequestException('Email is already in use');
             }
 
@@ -79,7 +72,6 @@ export class UserService implements IUserService {
             await this.userRepository.create(user);
             return
         } catch (error) {
-            this.logger.error(`Unable to create user: ${error.message}`, error.stack);
             throw error
         }
     }
@@ -113,7 +105,6 @@ export class UserService implements IUserService {
             }
             return
         } catch (error) {
-            this.logger.error('Unable to update user', error.stack);
             throw new BadRequestException('Failed to update user'); {
             }
         }
@@ -130,7 +121,6 @@ export class UserService implements IUserService {
             await this.userRepository.delete(id);
             return
         } catch (error) {
-            this.logger.error('Unable to delete user', error.stack);
             throw new BadRequestException('Failed to delete user');
         }
     }

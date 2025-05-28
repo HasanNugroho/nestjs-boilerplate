@@ -22,14 +22,14 @@ export class User {
     email: string;
 
     @Column('text')
-    chiperText: string;
+    chiper_text: string;
 
     @Column({ type: 'uuid', default: null, nullable: true })
     @Index()
     role_id: string;
 
     @Column({ type: 'boolean', default: true })
-    isActive: boolean;
+    is_active: boolean;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;
@@ -42,22 +42,22 @@ export class User {
         this.fullname = fullname;
         this.username = username;
         this.email = email;
-        this.chiperText = password;
+        this.chiper_text = password;
 
         return this;
     }
 
     async encryptPassword(password: string): Promise<void> {
         const saltOrRounds = 10;
-        this.chiperText = await bcrypt.hash(password, saltOrRounds);
+        this.chiper_text = await bcrypt.hash(password, saltOrRounds);
     }
 
     validatePasswordHash(password: string): boolean {
-        return bcrypt.compare(password, this.chiperText);
+        return bcrypt.compare(password, this.chiper_text);
     }
 
     toResponse() {
-        const { chiperText, ...userData } = this;
+        const { chiper_text, ...userData } = this;
         return userData;
     }
 }

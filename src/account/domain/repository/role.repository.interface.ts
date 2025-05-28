@@ -12,31 +12,31 @@ export interface IRoleRepository {
     create(role: Role): Promise<Role>;
 
     /**
-     * Finds a role by its ID.
+     * gets a role by its ID.
      * 
-     * @param id - The ID of the role to find.
+     * @param id - The ID of the role to get.
      * 
      * @returns A promise that resolves to the role with the given ID, or null if not found.
      */
-    findById(id: string): Promise<Role | null>;
+    getById(id: string): Promise<Role | null>;
 
     /**
-     * Finds multiple roles by their IDs.
+     * gets multiple roles by their IDs.
      * 
-     * @param ids - An array of role IDs to find.
+     * @param ids - An array of role IDs to get.
      * 
      * @returns A promise that resolves to an array of roles with the given IDs, or null if not found.
      */
-    findManyById(ids: string[]): Promise<Role[] | null>;
+    getManyById(ids: string[]): Promise<Role[] | null>;
 
     /**
-     * Finds all roles with a pagination filter.
+     * gets all roles with a pagination filter.
      * 
      * @param filter - The pagination filter to apply (including page number, page size, etc.).
      * 
      * @returns A promise that resolves to an object containing the roles and total count of roles.
      */
-    findAll(filter: PaginationOptionsDto): Promise<{ roles: Role[], totalCount: number }>;
+    getAll(filter: PaginationOptionsDto): Promise<{ roles: Role[], totalCount: number }>;
 
     /**
      * Updates an existing role by its ID.
