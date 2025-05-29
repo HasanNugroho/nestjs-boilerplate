@@ -41,7 +41,7 @@ export class AuthService implements IAuthService {
 
             return this.generateTokens(user.id);
         } catch (error) {
-            throw new BadRequestException('Invalid identifier or password');
+            throw error;
         }
     }
 
@@ -95,9 +95,6 @@ export class AuthService implements IAuthService {
             }
             throw new UnauthorizedException('Invalid refresh token', error);
         }
-    }
-
-    async resetPassword(token: string, newPassword: string): Promise<void> {
     }
 
     private async generateTokens(id: string): Promise<CredentialResponse> {

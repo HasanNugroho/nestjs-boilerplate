@@ -1,9 +1,8 @@
-import { BadRequestException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IUserService } from '../../domain/service/user.service.interface';
 import { IUserRepository } from "../../domain/repository/user.repository.interface";
 import { USER_REPOSITORY } from 'src/common/constant';
 import { User } from "../../domain/user";
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CreateUserDto, UpdateUserDto } from '../../presentation/dto/user.dto';
 
 @Injectable()
@@ -16,42 +15,21 @@ export class UserService implements IUserService {
 
     // Method to get a user by ID
     async getById(id: string): Promise<User> {
-        try {
-            const user = await this.userRepository.getById(id);
-            if (!user) {
-                throw new NotFoundException(`User with ID ${id} not found`);
-            }
-
-            return user;
-        } catch (err) {
-            throw err;
-        }
+        const user = await this.userRepository.getById(id);
+        if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+        return user;
     }
 
     async getByEmail(email: string): Promise<User> {
-        try {
-            const user = await this.userRepository.getByEmail(email);
-            if (!user) {
-                throw new NotFoundException(`User with email ${email} not found`);
-            }
-
-            return user;
-        } catch (err) {
-            throw err;
-        }
+        const user = await this.userRepository.getByEmail(email);
+        if (!user) throw new NotFoundException(`User with email ${email} not found`);
+        return user;
     }
 
     async getByUsername(username: string): Promise<User> {
-        try {
-            const user = await this.userRepository.getByUsername(username);
-            if (!user) {
-                throw new NotFoundException(`User with username ${username} not found`);
-            }
-
-            return user;
-        } catch (err) {
-            throw err;
-        }
+        const user = await this.userRepository.getByUsername(username);
+        if (!user) throw new NotFoundException(`User with username ${username} not found`);
+        return user;
     }
 
     // Method to create a new user
@@ -98,6 +76,13 @@ export class UserService implements IUserService {
             }
         }
 
+        if (userData.email) {
+            const existingUser = await this.userRepository.getByEmail(userData.email);
+            if (existingUser && existingUser.id !== id) {
+                throw new BadRequestException('Email is already in use by another user');
+            }
+        }
+
         try {
             const updatedUser = await this.userRepository.update(id, user);
             if (!updatedUser) {
@@ -105,8 +90,7 @@ export class UserService implements IUserService {
             }
             return
         } catch (error) {
-            throw new BadRequestException('Failed to update user'); {
-            }
+            throw error
         }
     }
 
@@ -121,7 +105,7 @@ export class UserService implements IUserService {
             await this.userRepository.delete(id);
             return
         } catch (error) {
-            throw new BadRequestException('Failed to delete user');
+            throw error;
         }
     }
 }

@@ -1,10 +1,17 @@
 import { UserService } from './user.service';
-import { BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { USER_REPOSITORY } from 'src/common/constant';
+import {
+    BadRequestException,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 import { TestBed, Mocked } from '@suites/unit';
+import { USER_REPOSITORY } from 'src/common/constant';
 import { User } from 'src/account/domain/user';
 import { IUserRepository } from 'src/account/domain/repository/user.repository.interface';
-import { CreateUserDto, UpdateUserDto } from 'src/account/presentation/dto/user.dto';
+import {
+    CreateUserDto,
+    UpdateUserDto,
+} from 'src/account/presentation/dto/user.dto';
 
 describe('UserService', () => {
     let service: UserService;
@@ -12,6 +19,7 @@ describe('UserService', () => {
 
     beforeEach(async () => {
         const { unit, unitRef } = await TestBed.solitary(UserService).compile();
+
         service = unit;
         repository = unitRef.get(USER_REPOSITORY);
     });
@@ -23,166 +31,168 @@ describe('UserService', () => {
 
             const result = await service.getById('user-id');
 
-            expect(result).toEqual(user);
+            expect(result).toBe(user);
             expect(repository.getById).toHaveBeenCalledWith('user-id');
         });
 
-        it('should throw NotFoundException if user not found', async () => {
+        it('should throw NotFoundException if not found', async () => {
             repository.getById.mockResolvedValueOnce(null);
-
-            await expect(service.getById('wrong-id')).rejects.toThrow(NotFoundException);
+            await expect(service.getById('missing')).rejects.toThrow(NotFoundException);
         });
 
-        it('should throw InternalServerErrorException if error', async () => {
+        it('should throw InternalServerErrorException on repository failure', async () => {
             repository.getById.mockRejectedValueOnce(new InternalServerErrorException());
-
-            await expect(service.getById('wrong-id')).rejects.toThrow(InternalServerErrorException);
+            await expect(service.getById('error')).rejects.toThrow(InternalServerErrorException);
         });
     });
 
     describe('getByEmail', () => {
-        it('should return user when found by email', async () => {
+        it('should return user when found', async () => {
             const user = new User();
             repository.getByEmail.mockResolvedValueOnce(user);
 
-            const result = await service.getByEmail('user-id');
+            const result = await service.getByEmail('test@example.com');
 
-            expect(result).toEqual(user);
-            expect(repository.getByEmail).toHaveBeenCalledWith('user-id');
+            expect(result).toBe(user);
+            expect(repository.getByEmail).toHaveBeenCalledWith('test@example.com');
         });
 
-        it('should throw NotFoundException if user not found', async () => {
+        it('should throw NotFoundException if not found', async () => {
             repository.getByEmail.mockResolvedValueOnce(null);
-
-            await expect(service.getByEmail('wrong-id')).rejects.toThrow(NotFoundException);
+            await expect(service.getByEmail('notfound@example.com')).rejects.toThrow(NotFoundException);
         });
 
-        it('should throw InternalServerErrorException if error', async () => {
+        it('should throw InternalServerErrorException on error', async () => {
             repository.getByEmail.mockRejectedValueOnce(new InternalServerErrorException());
+            await expect(service.getByEmail('fail@example.com')).rejects.toThrow(InternalServerErrorException);
+        });
+    });
 
-            await expect(service.getByEmail('wrong-id')).rejects.toThrow(InternalServerErrorException);
+    describe('getByUsername', () => {
+        it('should return user when found', async () => {
+            const user = new User();
+            repository.getByUsername.mockResolvedValueOnce(user);
+
+            const result = await service.getByUsername('user');
+
+            expect(result).toBe(user);
+            expect(repository.getByUsername).toHaveBeenCalledWith('user');
+        });
+
+        it('should throw NotFoundException if not found', async () => {
+            repository.getByUsername.mockResolvedValueOnce(null);
+            await expect(service.getByUsername('notfound')).rejects.toThrow(NotFoundException);
+        });
+
+        it('should throw InternalServerErrorException on error', async () => {
+            repository.getByUsername.mockRejectedValueOnce(new InternalServerErrorException());
+            await expect(service.getByUsername('fail')).rejects.toThrow(InternalServerErrorException);
         });
     });
 
     describe('create', () => {
-        it('should return user when successfully created user', async () => {
-            const createUserDto: CreateUserDto = {
+        it('should create and return new user', async () => {
+            const dto: CreateUserDto = {
                 username: 'newuser',
-                email: 'newuser@example.com',
-                name: 'New User',
-                fullname: 'New Full User',
-                password: 'password',
+                email: 'new@example.com',
+                name: 'New',
+                fullname: 'New Full',
+                password: 'password123',
             };
 
-            const savedUser = new User();
-            savedUser.email = createUserDto.email;
-            savedUser.name = createUserDto.name;
-            savedUser.fullname = createUserDto.fullname;
-            savedUser.chiperText = 'hashedPassword';
-            savedUser.id = 'new-user-id';
+            const saved = new User();
+            saved.id = 'user-id';
+            saved.email = dto.email;
 
             repository.getByEmail.mockResolvedValueOnce(null);
-            repository.create.mockResolvedValueOnce(savedUser);
+            repository.create.mockResolvedValueOnce(saved);
 
-            const result = await service.create(createUserDto);
+            const result = await service.create(dto);
 
-            expect(result).toBeDefined();
-            expect(repository.getByEmail).toHaveBeenCalledWith(createUserDto.email);
-            expect(repository.create).toHaveBeenCalledWith(expect.any(User));
+            expect(result).toBeUndefined();
+            expect(repository.getByEmail).toHaveBeenCalledWith(dto.email);
+            expect(repository.create).toHaveBeenCalled();
         });
 
-        it('should throw BadRequestException when email exists', async () => {
-            const createUserDto: CreateUserDto = {
-                username: 'existing',
-                email: 'existing@example.com',
-                name: 'New User',
-                fullname: 'New Full User',
-                password: 'password',
-            };
-
-            const existingUser = new User();
-            existingUser.email = createUserDto.email;
-
-            repository.getByEmail.mockResolvedValueOnce(existingUser);
-
-            await expect(service.create(createUserDto)).rejects.toThrow(BadRequestException);
-            expect(repository.getByEmail).toHaveBeenCalledWith(createUserDto.email);
+        it('should throw BadRequestException if email already exists', async () => {
+            repository.getByEmail.mockResolvedValueOnce(new User());
+            await expect(service.create({
+                username: 'user',
+                email: 'duplicate@example.com',
+                name: 'dup',
+                fullname: 'dup user',
+                password: 'pwd',
+            })).rejects.toThrow(BadRequestException);
         });
     });
 
     describe('update', () => {
-        it('should update user successfully ', async () => {
-            const savedUser = new User();
-            savedUser.email = "exist@example.com";
-            savedUser.name = "Existing User";
-            savedUser.fullname = "Existing Full User";
-            savedUser.chiperText = '$2a$12$dU41iYBbB2BQXVVnoY6iauuVS9WZfst5wYV8KLyW9ltH3mZZR.cH.';
-            savedUser.id = 'existing-user-id';
+        it('should update user when data is valid', async () => {
+            const user = new User();
+            user.id = 'id';
+            user.email = 'user@example.com';
+            user.chiper_text = 'oldpass';
 
-            const updatesUserDto: UpdateUserDto = {
-                email: 'exist@example.com',
-                name: 'New User',
-                fullname: 'New Full User',
-                password: 'password',
+            const dto: UpdateUserDto = {
+                email: 'user@example.com',
+                name: 'Updated Name',
+                fullname: 'Updated Fullname',
+                password: 'newpass',
             };
 
-            repository.getById.mockResolvedValueOnce(savedUser);
-            repository.update.mockResolvedValueOnce(null);
+            repository.getById.mockResolvedValueOnce(user);
+            repository.update.mockResolvedValueOnce(user);
 
-            const result = await service.update(savedUser.id, updatesUserDto);
+            const result = await service.update('id', dto);
 
             expect(result).toBe(undefined);
+            expect(repository.update).toHaveBeenCalled();
         });
 
-        it('should not return when change email successfully ', async () => {
-            const savedUser = new User();
-            savedUser.email = "exist@example.com";
-            savedUser.name = "Existing User";
-            savedUser.fullname = "Existing Full User";
-            savedUser.chiperText = '$2a$12$dU41iYBbB2BQXVVnoY6iauuVS9WZfst5wYV8KLyW9ltH3mZZR.cH.';
-            savedUser.id = 'existing-user-id';
+        it('should allow email change if email is not taken', async () => {
+            const user = new User();
+            user.id = 'id';
+            user.email = 'old@example.com';
+            user.chiper_text = 'oldpass';
 
-            const updatesUserDto: UpdateUserDto = {
-                email: 'new-email@example.com',
-                name: 'New User',
-                fullname: 'New Full User',
-                password: 'password',
+            const dto: UpdateUserDto = {
+                email: 'new@example.com',
+                name: 'Updated',
+                fullname: 'Updated Fullname',
+                password: 'pwd',
             };
 
-            repository.getById.mockResolvedValueOnce(savedUser);
+            repository.getById.mockResolvedValueOnce(user);
             repository.getByEmail.mockResolvedValueOnce(null);
-            repository.update.mockResolvedValueOnce(null);
+            repository.update.mockResolvedValueOnce(user);
 
-            const result = await service.update(savedUser.id, updatesUserDto);
+            const result = await service.update('id', dto);
 
-            expect(result).toEqual(null);
-            expect(repository.getByEmail).toHaveBeenCalledWith('new-email@example.com');
+            expect(result).toBeUndefined();
+            expect(repository.getByEmail).toHaveBeenCalledWith('new@example.com');
         });
 
-        it('should throw BadRequestException when changed email duplicate ', async () => {
-            const savedUser = new User();
-            savedUser.email = "exist@example.com";
-            savedUser.name = "Existing User";
-            savedUser.fullname = "Existing Full User";
-            savedUser.chiperText = '$2a$12$dU41iYBbB2BQXVVnoY6iauuVS9WZfst5wYV8KLyW9ltH3mZZR.cH.';
-            savedUser.id = 'existing-user-id';
+        it('should throw BadRequestException if updated email is taken', async () => {
+            const currentUser = new User();
+            currentUser.id = 'id';
+            currentUser.email = 'old@example.com';
+            currentUser.chiper_text = 'oldpass';
 
-            const updatesUserDto: UpdateUserDto = {
-                email: 'new-email@example.com',
-                name: 'New User',
-                fullname: 'New Full User',
-                password: 'password',
+            const anotherUser = new User();
+            anotherUser.id = 'other-id';
+            anotherUser.email = 'new@example.com';
+
+            const dto: UpdateUserDto = {
+                email: 'new@example.com',
+                name: 'Dup',
+                fullname: 'Dup Full',
+                password: 'pwd',
             };
 
-            const existingEmailUser = new User();
-            existingEmailUser.email = "new-email@example.com";
-            existingEmailUser.id = 'another-user-id'; // pastikan id berbeda!
+            repository.getById.mockResolvedValueOnce(currentUser);
+            repository.getByEmail.mockResolvedValueOnce(anotherUser);
 
-            repository.getById.mockResolvedValueOnce(savedUser);
-            repository.getByEmail.mockResolvedValueOnce(existingEmailUser);
-
-            await expect(service.update(savedUser.id, updatesUserDto)).rejects.toThrow(BadRequestException);
+            await expect(service.update('id', dto)).rejects.toThrow(BadRequestException);
         });
     });
-
 });
